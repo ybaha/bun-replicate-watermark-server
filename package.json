@@ -1,0 +1,19 @@
+{
+  "name": "sharp-watermark-server",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "update-types": "npx supabase gen types typescript --project-id \"qqkrxqsqwwqwowzpajai\" --schema public > types/supabase-types.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.42.5",
+    "hono": "^4.2.5",
+    "sharp": "^0.33.3"
+  }
+}
