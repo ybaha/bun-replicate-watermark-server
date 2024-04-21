@@ -8,6 +8,9 @@ const app = new Hono();
 app.post("/watermark", async (req, res) => {
   const body = await req.req.json();
 
+  // console.log where request is coming from
+  console.log(req.req.header());
+
   const predictionId = body.id;
   const status = body.status;
 
@@ -104,11 +107,29 @@ app.post("/watermark", async (req, res) => {
     .png()
     .toBuffer();
 
-  return new Response(output, {
-    headers: {
-      "Content-Type": "image/png",
-    },
-  });
+  const { data } = await supabase.storage
+    .from("images-processed")
+    .upload(`${profile.id}/${body.id}`, output);
+
+  if (!data?.path) {
+    return new Response(null, {
+      status: 500,
+    });
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("images-processed").getPublicUrl(data.path);
+
+  await supabase
+    .from("images")
+    .update({
+      status: "completed",
+      processed_url: publicUrl,
+    })
+    .eq("prediction_id", body.id);
+
+  return new Response("success");
 });
 
 Bun.serve({
