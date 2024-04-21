@@ -52,9 +52,12 @@ app.post("/watermark", async (req, res) => {
   console.log(profile);
 
   if (isPaidUser) {
+    const imageRes = await fetch(body.output[0]);
+    const imageBuffer = await imageRes.arrayBuffer();
+
     const { data } = await supabase.storage
       .from("images-processed")
-      .upload(`${profile.id}/${body.id}`, body.output[0]);
+      .upload(`${profile.id}/${body.id}`, imageBuffer);
 
     const {
       data: { publicUrl },
