@@ -52,11 +52,21 @@ app.post("/watermark", async (req, res) => {
   console.log(profile);
 
   if (isPaidUser) {
+    const { data } = await supabase.storage
+      .from("images-processed")
+      .upload(`${profile.id}/${body.id}`, body.output[0]);
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage
+      .from("images-processed")
+      .getPublicUrl(data?.path || "");
+
     await supabase
       .from("images")
       .update({
         status: "completed",
-        processed_url: body.output[0],
+        processed_url: publicUrl,
         with_watermark: false,
       })
       .eq("prediction_id", predictionId);
